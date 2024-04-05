@@ -1,0 +1,104 @@
+{{ define "content"}}
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="lucide lucide-braces w-16 h-16 m-auto"
+    >
+      <path
+        d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1"
+      />
+      <path
+        d="M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"
+      />
+    </svg>
+    <h2 class="mt-5 text-center text-2xl font-bold leading-9 tracking-tight">
+      Create the first user
+    </h2>
+  </div>
+  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <div class="alert mb-5">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="lucide lucide-message-circle-warning"
+      >
+        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
+        <path d="M12 8v4" />
+        <path d="M12 16h.01" />
+      </svg>
+      <span>
+        You are seeing this because
+        <code>DEVELOPMENT</code>
+        is set to true in the .env file and no users exist in the database.
+      </span>
+    </div>
+    {{ template "flash" .messages }}
+    <form
+      class="space-y-6"
+      method="post"
+      action="/setup"
+    >
+      <div>
+        <label
+          class="form-control w-full"
+          for="location"
+          ><div class="label font-bold">
+            <span class="label-text">Email</span>
+          </div>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            class="input input-bordered input-lg w-full"
+            placeholder="user@gmail.com"
+        /></label>
+      </div>
+      <div>
+        <label
+          class="form-control w-full"
+          for="team"
+          ><div class="label font-bold">
+            <span class="label-text">Password</span>
+          </div>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            class="input input-bordered input-lg w-full text-2xl"
+        /></label>
+      </div>
+      <div>
+        <button
+          type="submit"
+          class="btn btn-neutral w-full"
+        >
+          Sign in
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  html {
+    background-color: #efeae6;
+  }
+</style>
+
+{{ end }}

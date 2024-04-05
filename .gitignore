@@ -7,6 +7,16 @@
 *.dll
 *.so
 *.dylib
+ace-video
+
+# Config 
+.env
+
+# Data files
+*.db
+
+# Uploads
+assets/media/
 
 # Test binary, built with `go test -c`
 *.test
@@ -16,6 +26,7 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+node_modules
 
 # Go workspace file
 go.work
