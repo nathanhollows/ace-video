@@ -57,6 +57,8 @@ func createRoutes() {
 
 	router.Route("/admin", func(r chi.Router) {
 		r.Use(adminAuthMiddleware)
+		r.Get("/json", adminJSONhandler)
+		r.Get("/", adminMediaHandler)
 		r.Route("/media", func(r chi.Router) {
 			r.Get("/", adminMediaHandler)
 			r.Post("/", adminMediaUploadHandler)

@@ -1,0 +1,321 @@
+{{ define "content" }}
+
+<!-- Header -->
+<div class="flex flex-col md:flex-row justify-between items-center w-full py-5">
+  <h1 class="text-2xl p-5 font-bold">JSON</h1>
+</div>
+
+<!-- Messages -->
+{{ template "flash" .messages }}
+
+<div class="container mx-auto px-4">
+  <div class="container mx-auto px-4">
+    <div class="flex flex-row flex- gap-2 mb-4">
+      <label class="input input-bordered flex items-center gap-2">
+        Search
+        <input
+          type="text"
+          class="grow outline-none border-none focus:border-none focus:ring-0"
+          id="searchInput"
+        />
+      </label>
+
+      <label class="input basis-20 input-bordered flex items-center gap-2">
+        Tags
+        <input
+          type="text"
+          class="grow outline-none border-none focus:border-none focus:ring-0"
+          id="tagsInput"
+        />
+      </label>
+
+      <label class="input input-bordered flex items-center gap-2">
+        Limit
+        <input
+          type="number"
+          class="outline-none border-none focus:border-none focus:ring-0 focus:outline-none"
+          id="limit"
+        />
+      </label>
+
+      <label class="input input-bordered flex items-center gap-2">
+        Offset
+        <input
+          type="number"
+          class="outline-none border-none focus:border-none focus:ring-0"
+          id="offset"
+        />
+      </label>
+
+      <select
+        id="sortSelect"
+        class="select select-bordered"
+      >
+        <option value="">Sort By</option>
+        <option value="created_at_desc">Date Descending</option>
+        <option value="created_at_asc">Date Ascending</option>
+      </select>
+
+      <select
+        id="typeSelect"
+        class="select select-bordered"
+      >
+        <option value="">Type</option>
+        <option value="image">Image</option>
+        <option value="video">Video</option>
+      </select>
+    </div>
+
+    <div class="mb-4 flex justify-between items-center bg-base-200 p-4 rounded">
+      <code
+        id="dynamicUrl"
+        class="flex-grow"
+        >http://localhost:8090/data.json</code
+      >
+      <button
+        id="copyButton"
+        class="btn btn-neutral btn-sm ml-4"
+        onclick="copyToClipboard()"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-5 h-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-clipboard-copy"
+        >
+          <rect
+            width="8"
+            height="4"
+            x="8"
+            y="2"
+            rx="1"
+            ry="1"
+          />
+          <path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+          <path d="M16 4h2a2 2 0 0 1 2 2v4" />
+          <path d="M21 14H11" />
+          <path d="m15 10-4 4 4 4" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="container mx-auto px-4">
+    <!-- Existing Components -->
+
+    <!-- New Row for JSON and Media -->
+    <div class="flex mt-8">
+      <!-- JSON Output on the Left -->
+      <div class="w-1/2 pr-2">
+        <pre
+          class="bg-base-200 p-4 rounded overflow-x-scroll"
+        ><code></code></pre>
+      </div>
+
+      <!-- Media Placeholder on the Right -->
+      <div class="w-1/2 pl-2">
+        <div class="skeleton w-full h-64"></div>
+        <!-- Adjust the height as needed -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Media -->
+
+  <div class="container mx-auto px-4 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {{ range .media }}
+      <form
+        action="/admin/media/{{ .ID }}"
+        method="post"
+        class="bg-base-200 rounded-lg shadow overflow-hidden"
+      >
+        <button class="btn btn-primary btn-sm absolute m-3 shadow-md">
+          Save
+        </button>
+        {{ if eq .Type "image" }}
+        <img
+          src="/assets{{ .FilePath }}"
+          class="w-full h-48 object-cover"
+        />
+        {{ else if eq .Type "video" }}
+        <video
+          src="/assets{{ .FilePath }}"
+          type="{{ .MimeType }}"
+          class="w-full h-48 object-cover"
+          preload="none"
+          controls
+        ></video>
+        {{ end }}
+        <div class="flex flex-col p-4 gap-3">
+          <input
+            type="text"
+            name="title"
+            class="input w-full font-semibold"
+            placeholder="Title"
+            value="{{ .Title }}"
+          />
+          <input
+            type="text"
+            name="description"
+            class="input w-full"
+            placeholder="Description"
+            value="{{ .Description }}"
+          />
+          <input
+            type="text"
+            name="caption"
+            class="input w-full"
+            placeholder="Caption"
+            value="{{ .Caption }}"
+          />
+
+          <p class="text-base-content">{{ .Description }}</p>
+          <p class="text-base-content">{{ .Caption }}</p>
+          <div>
+            <p>
+              {{ range .Tags }}
+              <span class="badge badge-primary">{{ . }}</span>
+              {{ end }} {{ if eq (len .Tags) 0 }}
+              <span class="badge badge-secondary">No tags</span>
+              {{ end }}
+            </p>
+          </div>
+        </div>
+      </form>
+      {{ end }}
+    </div>
+  </div>
+</div>
+
+<script>
+  // Initial Options Matching the Go Struct
+  let options = {
+    limit: "",
+    offset: "",
+    sort: "",
+    order: "",
+    search: "",
+    tags: "",
+    type: "",
+    id: "",
+  };
+
+  document.addEventListener("DOMContentLoaded", () => {
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Function to fetch JSON data and render it
+    async function fetchAndDisplayJson() {
+      const dynamicUrl = document.getElementById("dynamicUrl").textContent;
+      try {
+        const response = await fetch(dynamicUrl);
+        if (!response.ok) throw new Error("Network response was not ok.");
+        const jsonData = await response.json();
+        document.querySelector("pre code").textContent = JSON.stringify(
+          jsonData,
+          null,
+          2
+        );
+      } catch (error) {
+        document.querySelector(
+          "pre code"
+        ).textContent = `Error fetching data: ${error.message}`;
+      }
+    }
+
+    // Modified updateDynamicUrl to include debounce
+    const debouncedFetchAndDisplayJson = debounce(fetchAndDisplayJson, 500); // 500 ms debounce period
+
+    // Elements that should trigger URL update on change
+    const elementsToUpdateURL = document.querySelectorAll(
+      "#searchInput, #limit, #offset, #sortSelect, #typeSelect, #tagsInput"
+    );
+
+    elementsToUpdateURL.forEach((element) => {
+      element.addEventListener("input", updateDynamicUrl); // For text/number inputs
+      element.addEventListener("change", updateDynamicUrl); // For dropdown changes
+    });
+
+    function updateDynamicUrl() {
+      // Ensure options are always up to date
+      options.search = document.getElementById("searchInput").value;
+      options.limit = document.getElementById("limit").value;
+      options.offset = document.getElementById("offset").value;
+      options.type = document.getElementById("typeSelect").value;
+      const sortValue = document.getElementById("sortSelect").value;
+      if (sortValue) {
+        const lastUnderscoreIndex = sortValue.lastIndexOf("_");
+        if (lastUnderscoreIndex > -1) {
+          options.sort = sortValue.substring(0, lastUnderscoreIndex); // Get everything before the last "_"
+          options.order = sortValue.substring(lastUnderscoreIndex + 1); // Get everything after the last "_"
+        } else {
+          options.sort = sortValue;
+          options.order = ""; // Default order if "_" is not present
+        }
+      } else {
+        options.sort = "";
+        options.order = "";
+      }
+      options.tags = document.getElementById("tagsInput").value;
+
+      // Filter out options with empty values
+      let filteredOptions = Object.entries(options).reduce(
+        (acc, [key, value]) => {
+          if (value) acc[key] = value; // Include only non-empty values
+          return acc;
+        },
+        {}
+      );
+
+      let queryParams = new URLSearchParams(filteredOptions).toString();
+      document.getElementById(
+        "dynamicUrl"
+      ).textContent = `http://localhost:8090/data.json?${queryParams}`;
+
+      debouncedFetchAndDisplayJson();
+    }
+
+    // Initialize with the current state
+    updateDynamicUrl();
+  });
+
+  function copyToClipboard() {
+    const urlToCopy = document.getElementById("dynamicUrl").textContent;
+    navigator.clipboard.writeText(urlToCopy).then(
+      () => {
+        alert("URL Copied!");
+      },
+      () => {
+        alert("Failed to copy URL");
+      }
+    );
+
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+  }
+</script>
+{{ end }}
