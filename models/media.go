@@ -88,6 +88,9 @@ func FindMatchingMedia(ctx context.Context, options JSONOptions) (Library, error
 	if options.Search != "" {
 		query = query.Where("title LIKE ?", "%"+options.Search+"%")
 	}
+	if options.Type != "" {
+		query = query.Where("mime_type LIKE ?", options.Type+"%")
+	}
 	if options.Tags != "" {
 		// Tags are comma separated
 		// The media must match any of the tags

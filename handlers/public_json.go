@@ -59,6 +59,9 @@ func parseJSONOptions(r *http.Request) (models.JSONOptions, error) {
 	if tags := r.URL.Query().Get("tags"); tags != "" {
 		options.Tags = tags
 	}
+	if mime := r.URL.Query().Get("type"); mime != "" {
+		options.Type = mime
+	}
 	if id := r.URL.Query().Get("id"); id != "" {
 		options.ID = id
 	}
