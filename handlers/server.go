@@ -43,7 +43,7 @@ func createRoutes() {
 	router.Use(middleware.StripSlashes)
 	router.Use(middleware.RedirectSlashes)
 
-	router.Get("/", nil)
+	router.Get("/", adminMediaHandler)
 
 	router.Get("/data.json", publicDataJSONHandler)
 
@@ -58,6 +58,7 @@ func createRoutes() {
 	router.Route("/admin", func(r chi.Router) {
 		r.Use(adminAuthMiddleware)
 		r.Get("/json", adminJSONhandler)
+		r.Get("/json/preview", adminJSONPreviewHandler)
 		r.Get("/", adminMediaHandler)
 		r.Route("/media", func(r chi.Router) {
 			r.Get("/", adminMediaHandler)

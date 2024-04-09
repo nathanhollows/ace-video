@@ -1,0 +1,57 @@
+{{ define "media" }} {{ range . }}
+<form
+  action="/admin/media/{{ .ID }}"
+  method="post"
+  class="bg-base-200 rounded-lg shadow overflow-hidden"
+>
+  {{ if eq .Type "image" }}
+  <img
+    src="{{ .GetPublicURL }}"
+    class="w-full h-48 object-cover"
+  />
+  {{ else if eq .Type "video" }}
+  <video
+    src="{{ .GetPublicURL }}"
+    type="{{ .MimeType }}"
+    class="w-full h-48 object-cover"
+    preload="none"
+    controls
+  ></video>
+  {{ end }}
+  <div class="flex flex-col p-4 gap-3">
+    <input
+      type="text"
+      name="title"
+      class="input w-full font-semibold"
+      placeholder="Title"
+      value="{{ .Title }}"
+    />
+    <input
+      type="text"
+      name="description"
+      class="input w-full"
+      placeholder="Description"
+      value="{{ .Description }}"
+    />
+    <input
+      type="text"
+      name="caption"
+      class="input w-full"
+      placeholder="Caption"
+      value="{{ .Caption }}"
+    />
+
+    <p class="text-base-content">{{ .Description }}</p>
+    <p class="text-base-content">{{ .Caption }}</p>
+    <div>
+      <p>
+        {{ range .Tags }}
+        <span class="badge badge-primary">{{ . }}</span>
+        {{ end }} {{ if eq (len .Tags) 0 }}
+        <span class="badge badge-secondary">No tags</span>
+        {{ end }}
+      </p>
+    </div>
+  </div>
+</form>
+{{ end }} {{ end }}

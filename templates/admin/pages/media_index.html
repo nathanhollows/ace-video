@@ -5,43 +5,43 @@
   <h1 class="text-2xl p-5 font-bold">Media</h1>
   <span class="flex md:flex-row flex-wrap justify-center space-x-3">
     <form
-    id="form"
-    enctype="multipart/form-data"
-    method="POST"
+      id="form"
+      enctype="multipart/form-data"
+      method="POST"
     >
-    <label
-    for="file-upload"
-    class="btn btn-primary"
-    >
-    <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="2"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    class="lucide lucide-cloud-upload"
-    >
-    <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
-    <path d="M12 12v9" />
-    <path d="m16 16-4-4-4 4" />
-  </svg>
-  Upload media
-</label>
-<input
-id="file-upload"
-class="hidden"
-accept="video/*,image/*"
-type="file"
-name="file"
-multiple
-onchange="document.getElementById('form').submit()"
-/>
-</form>
-</span>
+      <label
+        for="file-upload"
+        class="btn btn-primary"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-cloud-upload"
+        >
+          <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+          <path d="M12 12v9" />
+          <path d="m16 16-4-4-4 4" />
+        </svg>
+        Upload media
+      </label>
+      <input
+        id="file-upload"
+        class="hidden"
+        accept="video/*,image/*"
+        type="file"
+        name="file"
+        multiple
+        onchange="document.getElementById('form').submit()"
+      />
+    </form>
+  </span>
 </div>
 
 <!-- Messages -->
@@ -51,68 +51,8 @@ onchange="document.getElementById('form').submit()"
 
 <div class="container mx-auto px-4 py-8">
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-    {{ range .media }}
-    <form 
-      action="/admin/media/{{ .ID }}"
-      method="post"
-    class="bg-base-200 rounded-lg shadow overflow-hidden">
-        <button class="btn btn-primary btn-sm absolute m-3 shadow-md">Save</button>
-      {{ if eq .Type "image" }}
-      <img
-      src="/assets{{ .FilePath }}"
-      class="w-full h-48 object-cover"
-      />
-      {{ else if eq .Type "video" }}
-      <video
-      src="/assets{{ .FilePath }}"
-      type="{{ .MimeType }}"
-      class="w-full h-48 object-cover"
-      preload="none"
-      controls
-      ></video>
-      {{ end }}
-      <div
-      class="flex flex-col p-4 gap-3"
-      >
-        <input
-        type="text"
-        name="title"
-        class="input w-full font-semibold"
-        placeholder="Title"
-        value="{{ .Title }}"
-        />
-        <input 
-        type="text"
-        name="description"
-        class="input w-full"
-        placeholder="Description"
-        value="{{ .Description }}"
-        />
-        <input 
-        type="text"
-        name="caption"
-        class="input w-full"
-        placeholder="Caption"
-        value="{{ .Caption }}"
-        />
-
-        <p class="text-base-content">{{ .Description }}</p>
-        <p class="text-base-content">{{ .Caption }}</p>
-        <div>
-          <p>
-            {{ range .Tags }}
-            <span class="badge badge-primary">{{ . }}</span>
-            {{ end }}
-            {{ if eq (len .Tags) 0 }}
-            <span class="badge badge-secondary">No tags</span>
-            {{ end }}
-          </p>
-        </p>
-    </div>
-  </form>
-</div>
-{{ end }}
-</div>
+    {{ template "media" .media }}
+  </div>
 </div>
 
 {{ end }}

@@ -2,6 +2,7 @@ package models
 
 import (
 	"context"
+	"encoding/json"
 	"os"
 	"regexp"
 
@@ -129,8 +130,25 @@ func (m *Media) Type() string {
 	return re.FindString(m.MimeType)
 }
 
-// GetFileURL returns the URL of the file
-func (m *Media) GetFileURL() string {
+// Get Public URL returns the URL of the file
+func (m *Media) GetPublicURL() string {
 	site := os.Getenv("SITE_URL")
-	return site + "assets" + m.FilePath
+	return site + "/assets" + m.FilePath
+}
+
+// MarshalJSON marshals the library to JSON without modifying the original library
+func (l Library) MarshalJSON() ([]byte, error) {
+	// Create a new slice of pointers to Media objects
+	mediaCopies := make([]*Media, len(l))
+	// Iterate over the original slice to populate the new slice with copies
+	for i, media := range l {
+		// Create a copy of the Media object
+		mediaCopy := *media
+		// Modify the FilePath of the copy
+		mediaCopy.FilePath = mediaCopy.GetPublicURL()
+		// Store the pointer to the copy in the new slice
+		mediaCopies[i] = &mediaCopy
+	}
+	// Marshal the new slice of copies
+	return json.MarshalIndent(mediaCopies, "", " ")
 }
